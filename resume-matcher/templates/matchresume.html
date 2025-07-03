@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resume Matcher</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(to right, #f7f9fc, #e3f2fd);
+      font-family: 'Poppins', sans-serif;
+    }
+    .container {
+      margin-top: 50px;
+    }
+    .card {
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      background-color: #ffffff;
+    }
+    .card-header {
+      background: linear-gradient(to right, #007bff, #00bcd4);
+      color: white;
+      border-radius: 15px 15px 0 0;
+      padding: 15px 30px;
+      text-align: center;
+    }
+    .form-group label {
+      font-weight: 500;
+    }
+    .btn-primary {
+      background-color: #007bff;
+      border-color: #007bff;
+      padding: 10px 25px;
+      border-radius: 30px;
+      font-weight: 500;
+    }
+    .score-table th, .score-table td {
+      text-align: center;
+      vertical-align: middle;
+    }
+    .score-table thead {
+      background-color: #e3f2fd;
+    }
+    .highlight {
+      font-weight: bold;
+      color: #007bff;
+    }
+    .badge-skill {
+      display: inline-block;
+      margin: 2px;
+      padding: 5px 10px;
+      background-color: #007bff;
+      color: white;
+      border-radius: 15px;
+      font-size: 0.85rem;
+    }
+    .badge-missing {
+      background-color: #f44336;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="card-header">
+        <h2>💼 Smart Resume Matcher (ATS Enhanced)</h2>
+      </div>
+      <div class="card-body">
+        <form method="POST" action="/matcher" enctype="multipart/form-data">
+          <div class="form-group">
+            <label for="job_description">📝 Job Description:</label>
+            <textarea class="form-control" id="job_description" name="job_description" rows="5" required placeholder="Paste job description here..."></textarea>
+          </div>
+          <div class="form-group">
+            <label for="resumes">📎 Upload Resumes (PDF, DOCX, TXT):</label>
+            <input type="file" class="form-control" id="resumes" name="resumes" multiple required accept=".pdf, .docx, .txt" />
+          </div>
+          <div class="text-center">
+            <button type="submit" class="btn btn-primary">🚀 Match Resumes</button>
+          </div>
+        </form>
+
+        {% if results %}
+        <div class="mt-5">
+          <h4 class="text-success">🎯 Top Matching Resumes</h4>
+          <table class="table table-bordered score-table mt-3">
+            <thead>
+              <tr>
+                <th>📄 Resume</th>
+                <th>📊 Cosine Similarity (%)</th>
+                <th>🔍 Skill Match (%)</th>
+                <th>⭐ Final ATS Score</th>
+                <th>✅ Matched Skills</th>
+                <th>❌ Missing Skills</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for result in results %}
+              <tr>
+                <td class="highlight">{{ result.name }}</td>
+                <td>{{ result.cosine }}</td>
+                <td>{{ result.skill_score }}</td>
+                <td><strong>{{ result.final_score }}</strong></td>
+                <td>
+                  {% for skill in result.matched_skills %}
+                    <span class="badge badge-skill">{{ skill }}</span>
+                  {% endfor %}
+                </td>
+                <td>
+                  {% for skill in result.missing_skills %}
+                    <span class="badge badge-skill badge-missing">{{ skill }}</span>
+                  {% endfor %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</body>
+</html>
